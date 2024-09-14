@@ -1,6 +1,6 @@
 # Anki Kana Extractor
 
-[View Online](https://github.com/xwipeoutx/anki-extractor)
+[View Online](https://stevesspace.com/anki-extractor/)
 
 ## Description
 
