@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anki Kana Extractor</title>
+</head>
+
+<body>
+    <h1>Upload Anki (.apkg) File to Extract Kana</h1>
+    <input type="file" id="fileInput" accept=".apkg" />
+    <br />
+    <textarea id="output" cols="100" rows="30"></textarea>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.11/pako.min.js"></script>
+
+    <script>
+        function onlyUnique(value, index, array) {
+            return array.indexOf(value) === index;
+        }
+
+        // Regular expressions for Hiragana, Katakana, and Kanji
+        const kanaRegex = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+/g;
+
+
+
+        const hiraganaRegex = /[\u3040-\u309F]+/g;
+        const katakanaRegex = /[\u30A0-\u30FF]+/g;
+        const kanjiRegex = /[\u4E00-\u9FAF]+/g;
+
+        const fileInput = document.getElementById('fileInput');
+        const output = document.getElementById('output');
+
+        fileInput.addEventListener('change', handleFileUpload);
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Read the file as ArrayBuffer
+            const arrayBuffer = await file.arrayBuffer();
+
+            // Unzip the .apkg file (zip archive)
+            const jsZip = new JSZip();
+            const zip = await jsZip.loadAsync(arrayBuffer);
+
+            // Extract the SQLite database (usually called 'collection.anki2')
+            const dbFile = await zip.file('collection.anki2').async('arraybuffer');
+
+            // Load the SQLite database using SQL.js
+            const SQL = await initSqlJs();
+            const db = new SQL.Database(new Uint8Array(dbFile));
+
+            // Run SQL to extract the 'flds' column from the 'notes' table
+            const res = db.exec("SELECT flds FROM notes");
+            if (res.length === 0) {
+                output.textContent = 'No notes found in the database.';
+                return;
+            }
+
+            // Extract kana and kanji from the 'flds' field
+            const rows = res[0].values;
+
+            const extractedData = rows.flatMap(row => {
+                const fields = row[0].split('\u001F'); // Fields in Anki are separated by a unit separator
+                return fields.flatMap(text => {
+                    const kana = text.match(kanaRegex) || [];
+                    return kana;
+                });
+            }).filter(onlyUnique);
+
+            // Output the extracted data
+            output.textContent = extractedData.join("\n");
+        }
+    </script>
+
+    <!-- Include JSZip to handle zip extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+</body>
+
+</html>
