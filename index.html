@@ -5,13 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anki Kana Extractor</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
+    <style>
+        .github-fork-ribbon:before {
+            background-color: #888;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Upload Anki (.apkg) File to Extract Kana</h1>
+    <h1>Anki Kana Extractor</h1>
     <input type="file" id="fileInput" accept=".apkg" />
     <br />
-    <textarea id="output" cols="100" rows="30"></textarea>
+    <textarea id="output" rows="12"></textarea>
+
+    <p>
+        Use this tool to extract kana from anki decks. Designed to make it easy to copy/paste the raw text into JPDB
+        (never had much luck with their ANKI importer...)
+    </p>
+
+    <ul>
+        <li><a href="https://ankiweb.net/shared/decks" target="_blank">Anki Decks</a></li>
+        <li><a href="https://jpdb.io/" target="_blank">JPDB</a></li>
+    </ul>
+
+    <a class="github-fork-ribbon" href="https://github.com/xwipeoutx/anki-extractor" data-ribbon="Fork me on GitHub"
+        title="Fork me on GitHub">Fork me on GitHub</a>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.11/pako.min.js"></script>
